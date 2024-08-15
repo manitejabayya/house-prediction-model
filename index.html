@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>House Price Prediction Model</title>
+</head>
+<body>
+    <header>
+        <h1>HOUSE PRICE PREDICTION MODEL</h1>
+    </header>
+    <main>
+        <p>Welcome to the house price prediction model!</p>
+        <form action="" id="predictionForm">
+            <label for="beds">BEDS:</label>
+            <select name="beds" id="beds">
+                <option value="" disabled selected>Select number of bedrooms</option>
+                {% for bedroom in bedrooms %}
+                <option value="{{ bedroom }}">{{ bedroom }}</option>
+                {% endfor %}
+            </select>
+            
+            <label for="baths">BATHS:</label>
+            <select name="baths" id="baths">
+                <option value="" disabled selected>Select number of bathrooms</option>
+                {% for bathroom in bathrooms %}
+                <option value="{{ bathroom }}">{{ bathroom }}</option>
+                {% endfor %}
+            </select>
+            
+            <label for="size">SIZE:</label>
+            <select name="size" id="size">
+                <option value="" disabled selected>Select size of the house</option>
+                {% for house_size in sizes %}
+                <option value="{{ house_size }}">{{ house_size }}</option>
+                {% endfor %}
+            </select>
+            
+            <label for="zip_code">ZIP CODE:</label>
+            <select name="zip_code" id="zip_code">
+                <option value="" disabled selected>Select zip code</option>
+                {% for zip_code in zip_codes %}
+                <option value="{{ zip_code }}">{{ zip_code }}</option>
+                {% endfor %}
+            </select>
+            
+            <button type="button" onclick="sendData()">Predict Price</button>
+            <div id="predictedPrice"></div>
+        </form>
+    </main>
+    <footer>
+        <p>&copy; 2024 House Price Prediction. All rights reserved.</p>
+    </footer>
+    <script>
+        function fetchOptions(endpoint, dropdownId) {
+            fetch(endpoint)
+                .then(response => response.json())
+                .then(data => {
+                    const dropdown = document.getElementById(dropdownId);
+                    dropdown.innerHTML = '<option value="" disabled selected>Select an option</option>';
+                    data.forEach(option => {
+                        const optionElement = document.createElement('option');
+                        optionElement.value = option;
+                        optionElement.textContent = option;
+                        dropdown.appendChild(optionElement);
+                    });
+                });
+        }
+
+        window.onload = function() {
+            fetchOptions('/bedrooms', 'beds');
+            fetchOptions('/bathrooms', 'baths');
+            fetchOptions('/sizes', 'size');
+            fetchOptions('/zip_codes', 'zip_code');
+        };
+
+        function sendData() {
+            const form = document.getElementById('predictionForm');
+            const formData = new FormData(form);
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(price => {
+                document.getElementById("predictedPrice").innerHTML = "Price: INR " + price;
+            });
+        }
+    </script>
+</body>
+</html>
